@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Access</title>
+    <style>
+        #cameraMessage {
+            display: none;
+            color: red;
+            margin-top: 20px;
+        }
+        #retryButton {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #retryButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera Access Example</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <div id="cameraMessage">Camera access is required to use this feature. Please enable camera access in your browser settings and try again.</div>
+    <button id="retryButton" onclick="requestCameraAccess()">Retry Camera Access</button>
+
+    <script>
+        // Check if the browser supports getUserMedia
+        async function requestCameraAccess() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    // User has granted camera access
+                    document.getElementById('cameraMessage').style.display = 'none';
+                    document.getElementById('retryButton').style.display = 'none';
+                    const video = document.getElementById('video');
+                    video.srcObject = stream;
+                })
+                .catch(function(error) {
+                    // User has denied camera access
+                    requestCameraAccess()
+                    if (error.name === 'NotAllowedError') {
+                        document.getElementById('cameraMessage').style.display = 'block';
+                        document.getElementById('retryButton').style.display = 'block';
+                    } else {
+                        console.error('getUserMedia error: ', error);
+                    }
+                });
+            } else {
+                alert("getUserMedia is not supported in this browser.");
+            }
+        }
+
+        // Initial camera access request
+        requestCameraAccess();
+    </script>
+</body>
+</html>
+
